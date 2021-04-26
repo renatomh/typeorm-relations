@@ -12,11 +12,23 @@ class OrdersRepository implements IOrdersRepository {
   }
 
   public async create({ customer, products }: ICreateOrderDTO): Promise<Order> {
-    // TODO
+    // As nossas entidades já estão relacionadas, então basta passar os objetos recebidos
+    const order = this.ormRepository.create({
+      customer,
+      order_products: products,
+    });
+    await this.ormRepository.save(order);
+    return order;
   }
 
   public async findById(id: string): Promise<Order | undefined> {
-    // TODO
+    // Buscando o pedido e as informações relacionadas
+    const order = this.ormRepository.findOne(id, {
+      // Selecionando também os produtos do pedido e o cliente
+      // Aqui funciona como o 'EagerLoading'
+      relations: ['order_products', 'customer'],
+    });
+    return order;
   }
 }
 
